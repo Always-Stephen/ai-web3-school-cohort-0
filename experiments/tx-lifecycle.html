@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web3 交易生命周期 | AI × Web3 School</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0d1117; color: #c9d1d9; min-height: 100vh; display: flex; justify-content: center; padding: 2rem; }
+  .container { max-width: 900px; width: 100%; }
+  h1 { font-size: 1.5rem; margin-bottom: .25rem; color: #58a6ff; }
+  .subtitle { color: #8b949e; margin-bottom: 1.5rem; font-size: .9rem; }
+
+  /* Pipeline */
+  .pipeline { display: flex; gap: .5rem; margin-bottom: 2rem; flex-wrap: wrap; justify-content: center; }
+  .step { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1rem .8rem; text-align: center; cursor: pointer; transition: .2s; flex: 1; min-width: 90px; max-width: 140px; }
+  .step:hover { border-color: #58a6ff; background: #1c2430; }
+  .step.active { border-color: #58a6ff; background: #1c2430; box-shadow: 0 0 12px rgba(88,166,255,.2); }
+  .step .icon { font-size: 1.5rem; margin-bottom: .3rem; display: block; }
+  .step .label { font-size: .75rem; font-weight: 600; color: #8b949e; }
+  .step.active .label { color: #58a6ff; }
+
+  /* Detail panel */
+  .detail { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; min-height: 180px; }
+  .detail h2 { color: #58a6ff; font-size: 1.1rem; margin-bottom: .75rem; }
+  .detail p { color: #8b949e; line-height: 1.6; font-size: .9rem; }
+  .detail ul { list-style: none; margin-top: .5rem; }
+  .detail li { padding: .3rem 0; font-size: .85rem; color: #c9d1d9; }
+  .detail li::before { content: '▸ '; color: #58a6ff; }
+  .detail .code { background: #0d1117; border: 1px solid #30363d; border-radius: 4px; padding: .6rem; margin-top: .75rem; font-family: monospace; font-size: .8rem; color: #7ee787; overflow-x: auto; }
+
+  /* Gas Calculator */
+  .gas-calc { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .gas-calc h2 { color: #f0883e; font-size: 1.1rem; margin-bottom: .75rem; }
+  .gas-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: .75rem; }
+  .gas-field { flex: 1; min-width: 120px; }
+  .gas-field label { display: block; font-size: .75rem; color: #8b949e; margin-bottom: .25rem; }
+  .gas-field input, .gas-field select { width: 100%; background: #0d1117; border: 1px solid #30363d; border-radius: 4px; padding: .5rem; color: #c9d1d9; font-size: .85rem; }
+  .gas-result { background: #0d1117; border: 1px solid #30363d; border-radius: 4px; padding: .75rem; margin-top: .5rem; font-family: monospace; font-size: .85rem; }
+  .gas-result span { color: #f0883e; font-weight: bold; }
+
+  /* Quiz */
+  .quiz { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1.5rem; }
+  .quiz h2 { color: #3fb950; font-size: 1.1rem; margin-bottom: .75rem; }
+  .quiz-q { margin-bottom: .75rem; font-size: .9rem; }
+  .quiz-options { display: flex; flex-direction: column; gap: .4rem; }
+  .quiz-btn { background: #21262d; border: 1px solid #30363d; border-radius: 4px; padding: .5rem .75rem; text-align: left; color: #c9d1d9; cursor: pointer; font-size: .85rem; transition: .2s; }
+  .quiz-btn:hover { border-color: #58a6ff; }
+  .quiz-btn.correct { border-color: #3fb950; background: #1a3020; color: #3fb950; }
+  .quiz-btn.wrong { border-color: #f85149; background: #301a1a; color: #f85149; }
+  .quiz-feedback { margin-top: .5rem; font-size: .85rem; min-height: 1.2rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔗 Web3 交易生命周期</h1>
+  <p class="subtitle">钱包 → 签名 → 交易 → Gas → 合约执行 · 点击每个节点查看详情</p>
+
+  <div class="pipeline" id="pipeline">
+    <div class="step active" data-step="0"><span class="icon">🔑</span><span class="label">钱包</span></div>
+    <div class="step" data-step="1"><span class="icon">✍️</span><span class="label">签名</span></div>
+    <div class="step" data-step="2"><span class="icon">📦</span><span class="label">交易</span></div>
+    <div class="step" data-step="3"><span class="icon">⛽</span><span class="label">Gas</span></div>
+    <div class="step" data-step="4"><span class="icon">📜</span><span class="label">合约执行</span></div>
+  </div>
+
+  <div class="detail" id="detail"></div>
+
+  <div class="gas-calc">
+    <h2>⛽ Gas 费用计算器</h2>
+    <div class="gas-row">
+      <div class="gas-field">
+        <label>Gas Limit</label>
+        <input type="number" id="gasLimit" value="21000" placeholder="21000">
+      </div>
+      <div class="gas-field">
+        <label>Gas Price (Gwei)</label>
+        <input type="number" id="gasPrice" value="20" placeholder="20">
+      </div>
+      <div class="gas-field">
+        <label>ETH 价格 (USD)</label>
+        <input type="number" id="ethPrice" value="3500" placeholder="3500">
+      </div>
+    </div>
+    <div class="gas-result">
+      ETH: <span id="gasEth">0.00042</span> ·
+      USD: <span id="gasUsd">$1.47</span> ·
+      Gwei: <span id="gasGwei">420,000</span>
+    </div>
+  </div>
+
+  <div class="quiz">
+    <h2>🧠 快速测验</h2>
+    <div class="quiz-q" id="quizQuestion"></div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="quiz-feedback" id="quizFeedback"></div>
+  </div>
+</div>
+
+<script>
+const steps = [
+  {
+    title: '🔑 钱包 (Wallet)',
+    text: '钱包不只是"装币的"，它是你在链上的<strong>身份入口和签名工具</strong>。',
+    bullets: [
+      'EOA (Externally Owned Account)：由私钥控制，用户持有',
+      'Smart Account (合约账户)：由代码控制，适合 Agent 权限管理',
+      '钱包管理私钥 → 私钥派生公钥 → 公钥生成地址',
+      '核心原则：私钥绝不公开，助记词离线保管'
+    ],
+    code: '// 从私钥派生地址\nconst wallet = ethers.Wallet.createRandom();\nconsole.log(wallet.address); // 0x...'
+  },
+  {
+    title: '✍️ 签名 (Signature)',
+    text: '签名证明 <strong>你授权了这笔交易</strong>，数学上无法伪造。',
+    bullets: [
+      '用私钥对交易数据做 ECDSA 签名',
+      '任何人可以用公钥验证签名，但无法反向推导私钥',
+      '签名包含：r, s, v 三个值（65 字节）',
+      'EIP-712 结构化签名：用户能看到签的是什么内容'
+    ],
+    code: '// 签名一条消息\nconst sig = await wallet.signMessage("Hello Web3");\n// 0x... (65 字节的签名)'
+  },
+  {
+    title: '📦 交易 (Transaction)',
+    text: '交易是链上状态变更的<strong>唯一入口</strong>。',
+    bullets: [
+      '字段：from, to, value, data, gasLimit, gasPrice, nonce',
+      'nonce 保证顺序且防重放攻击',
+      'data 字段可以传合约调用参数（ABI 编码）',
+      '发送后进入 mempool 等待矿工打包'
+    ],
+    code: '// 发送一笔 ETH 转账\nconst tx = await wallet.sendTransaction({\n  to: "0xRecipient...",\n  value: ethers.parseEther("0.01")\n});\nawait tx.wait(); // 等待确认'
+  },
+  {
+    title: '⛽ Gas',
+    text: 'Gas 是链上计算的<strong>"燃料"</strong>，防止无限循环和垃圾交易。',
+    bullets: [
+      'Gas Limit：你愿意为这笔交易支付的最大 gas 量',
+      'Gas Price：每单位 gas 的出价，越高越快被打包',
+      '总费用 = Gas Used × Gas Price',
+      'EIP-1559 后分 base fee（燃烧）+ priority fee（给矿工小费）'
+    ],
+    code: '// 估算 gas\nconst estimate = await wallet.estimateGas({\n  to: "0x...", value: ethers.parseEther("1")\n});\n// estimate = 21000 (标准转账)'
+  },
+  {
+    title: '📜 合约执行 (Contract Execution)',
+    text: '合约代码在 EVM 中<strong>确定性执行</strong>，结果全网一致。',
+    bullets: [
+      'EVM 是一个栈式虚拟机，所有节点运行相同字节码',
+      '状态变更通过 storage 持久化（消耗 gas）',
+      '事件 (Events) 提供链上日志——便宜的存储方式',
+      '执行结果：成功（状态变更）或 revert（回滚，仍消耗 gas）'
+    ],
+    code: '// 调用合约方法\nconst contract = new ethers.Contract(addr, abi, wallet);\nconst tx = await contract.transfer("0x...", 100);\nawait tx.wait();\n// 合约内部执行 transfer 逻辑，更新 balances mapping'
+  }
+];
+
+const quizQuestions = [
+  { q: '钱包在 Web3 中最重要的作用是什么？', options: ['存币', '身份和签名入口', '挖矿', '浏览 DApp'], correct: 1 },
+  { q: 'nonce 的主要作用？', options: ['记录时间', '防重放 + 保证顺序', '计算 gas', '加密交易'], correct: 1 },
+  { q: 'EIP-1559 引入后，Gas 费用的哪个部分会被燃烧？', options: ['Priority fee', 'Base fee', 'Gas limit', 'Value'], correct: 1 },
+  { q: '合约执行 revert 后，Gas 费用会退回吗？', options: ['全部退回', '部分退回', '不退回（仍消耗）', '双倍退回'], correct: 2 }
+];
+
+let currentQuiz = 0;
+let selectedStep = 0;
+
+function renderDetail(i) {
+  const s = steps[i];
+  const bullets = s.bullets.map(b => `<li>${b}</li>`).join('');
+  document.getElementById('detail').innerHTML = `
+    <h2>${s.title}</h2>
+    <p>${s.text}</p>
+    <ul>${bullets}</ul>
+    ${s.code ? `<div class="code">${s.code}</div>` : ''}
+  `;
+  document.querySelectorAll('.step').forEach((el, idx) => el.classList.toggle('active', idx === i));
+}
+
+document.getElementById('pipeline').addEventListener('click', e => {
+  const step = e.target.closest('.step');
+  if (!step) return;
+  selectedStep = parseInt(step.dataset.step);
+  renderDetail(selectedStep);
+});
+
+function calcGas() {
+  const limit = parseFloat(document.getElementById('gasLimit').value) || 0;
+  const price = parseFloat(document.getElementById('gasPrice').value) || 0;
+  const eth = parseFloat(document.getElementById('ethPrice').value) || 0;
+  const totalGwei = limit * price;
+  const totalEth = totalGwei / 1e9;
+  const totalUsd = totalEth * eth;
+  document.getElementById('gasEth').textContent = totalEth.toFixed(8);
+  document.getElementById('gasUsd').textContent = '$' + totalUsd.toFixed(2);
+  document.getElementById('gasGwei').textContent = totalGwei.toLocaleString();
+}
+
+['gasLimit','gasPrice','ethPrice'].forEach(id => {
+  document.getElementById(id).addEventListener('input', calcGas);
+});
+
+function renderQuiz() {
+  const q = quizQuestions[currentQuiz];
+  document.getElementById('quizQuestion').textContent = `Q${currentQuiz+1}: ${q.q}`;
+  document.getElementById('quizOptions').innerHTML = q.options.map((o, i) =>
+    `<button class="quiz-btn" data-idx="${i}">${o}</button>`
+  ).join('');
+  document.getElementById('quizFeedback').textContent = '';
+}
+
+document.getElementById('quizOptions').addEventListener('click', e => {
+  const btn = e.target.closest('.quiz-btn');
+  if (!btn) return;
+  const chosen = parseInt(btn.dataset.idx);
+  const correct = quizQuestions[currentQuiz].correct;
+  const allBtns = document.querySelectorAll('.quiz-btn');
+  allBtns.forEach(b => b.disabled = true);
+  allBtns[correct].classList.add('correct');
+  if (chosen !== correct) { btn.classList.add('wrong'); }
+  document.getElementById('quizFeedback').textContent = chosen === correct
+    ? '✅ 正确！' : `❌ 正确答案是：${quizQuestions[currentQuiz].options[correct]}`;
+  setTimeout(() => {
+    currentQuiz = (currentQuiz + 1) % quizQuestions.length;
+    renderQuiz();
+  }, 2000);
+});
+
+renderDetail(0);
+renderQuiz();
+calcGas();
+</script>
+</body>
+</html>
