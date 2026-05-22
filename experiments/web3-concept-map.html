@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web3 概念地图 | AI × Web3 School</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0d1117; color: #c9d1d9; min-height: 100vh; }
+  .header { background: #161b22; border-bottom: 1px solid #30363d; padding: 1rem 2rem; position: sticky; top:0; z-index:10; display:flex; justify-content:space-between; align-items:center; }
+  .header h1 { font-size: 1.2rem; color: #58a6ff; }
+  .header .sub { font-size: .8rem; color: #8b949e; }
+
+  .layout { display: flex; height: calc(100vh - 60px); }
+  
+  /* Sidebar */
+  .sidebar { width: 280px; background: #161b22; border-right: 1px solid #30363d; overflow-y: auto; padding: 1rem; flex-shrink: 0; }
+  .sidebar h3 { color: #8b949e; font-size: .75rem; text-transform: uppercase; margin: 1rem 0 .5rem; }
+  .sidebar h3:first-child { margin-top:0; }
+  .concept-item { display: flex; align-items: center; gap: .5rem; padding: .5rem .6rem; border-radius: 6px; cursor: pointer; font-size: .85rem; transition: .15s; margin-bottom: 2px; }
+  .concept-item:hover { background: #1c2430; }
+  .concept-item.active { background: #1c2d40; border-left: 3px solid #58a6ff; }
+  .concept-item .diff { font-size: .65rem; padding: 1px 6px; border-radius: 3px; margin-left: auto; }
+  .diff-1 { background: #1a3020; color: #3fb950; }
+  .diff-2 { background: #302a10; color: #d29922; }
+  .diff-3 { background: #301a1a; color: #f85149; }
+
+  /* Main */
+  .main { flex:1; overflow-y: auto; padding: 2rem; }
+  
+  /* Concept map */
+  .map { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .75rem; margin-bottom: 2rem; }
+  .map-node { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1rem; cursor: pointer; transition: .2s; text-align: center; }
+  .map-node:hover { border-color: #58a6ff; transform: translateY(-2px); }
+  .map-node.active { border-color: #58a6ff; background: #1c2d40; box-shadow: 0 0 16px rgba(88,166,255,.15); }
+  .map-node .icon { font-size: 1.8rem; display: block; margin-bottom: .4rem; }
+  .map-node .title { font-weight: 600; font-size: .9rem; }
+  .map-node .brief { font-size: .7rem; color: #8b949e; margin-top: .25rem; }
+
+  /* Detail panel */
+  .detail { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1.5rem; }
+  .detail h2 { color: #58a6ff; font-size: 1.3rem; margin-bottom: .25rem; }
+  .detail .meta { color: #8b949e; font-size: .8rem; margin-bottom: 1rem; }
+  .detail p.desc { line-height: 1.7; margin-bottom: 1rem; }
+  .detail h3 { color: #f0883e; font-size: .95rem; margin: 1rem 0 .5rem; }
+  .detail ul { list-style: none; }
+  .detail li { padding: .3rem 0; font-size: .88rem; line-height: 1.5; }
+  .detail li::before { content: '▸ '; color: #58a6ff; }
+  .detail .bridge { background: #1a2028; border: 1px solid #30363d; border-radius: 6px; padding: .75rem; margin-top: 1rem; font-size: .85rem; }
+  .detail .bridge strong { color: #3fb950; }
+  .detail .links { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1rem; }
+  .detail .links a { color: #58a6ff; text-decoration: none; font-size: .8rem; padding: .3rem .6rem; border: 1px solid #30363d; border-radius: 4px; }
+  .detail .links a:hover { border-color: #58a6ff; background: #1c2430; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: .5rem; margin-bottom: 1.5rem; }
+  .tab { padding: .5rem 1rem; border-radius: 6px; cursor: pointer; font-size: .85rem; border: 1px solid #30363d; background: transparent; color: #8b949e; }
+  .tab.active { background: #1c2d40; border-color: #58a6ff; color: #58a6ff; }
+
+  @media (max-width: 768px) {
+    .layout { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #30363d; display: flex; flex-wrap: wrap; gap: .25rem; padding: .5rem; }
+    .sidebar h3 { display: none; }
+    .concept-item { font-size: .75rem; padding: .3rem .5rem; }
+    .map { grid-template-columns: repeat(2, 1fr); }
+    .main { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <div><h1>🌐 Web3 概念地图</h1><span class="sub">AI × Web3 School · 10 个基础概念 + Bridge 连接</span></div>
+  <div style="font-size:.8rem;color:#8b949e">点击节点查看详情</div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <h3>Web3 基础</h3>
+    <div class="concept-item active" data-id="network"><span>🌐</span> Network<span class="diff diff-2">★★</span></div>
+    <div class="concept-item" data-id="cryptography"><span>🔐</span> Cryptography<span class="diff diff-2">★★</span></div>
+    <div class="concept-item" data-id="wallet"><span>👛</span> Wallet<span class="diff diff-2">★★</span></div>
+    <div class="concept-item" data-id="smart-contract"><span>📜</span> Smart Contract<span class="diff diff-2">★★</span></div>
+    <div class="concept-item" data-id="account-abstraction"><span>🏦</span> Account Abstraction<span class="diff diff-3">★★★</span></div>
+    <div class="concept-item" data-id="defi"><span>💰</span> DeFi<span class="diff diff-2">★★</span></div>
+    <div class="concept-item" data-id="oracle"><span>🔮</span> Oracle<span class="diff diff-3">★★★</span></div>
+    <div class="concept-item" data-id="indexing"><span>📊</span> Indexing<span class="diff diff-2">★★</span></div>
+    <div class="concept-item" data-id="security"><span>🛡️</span> Security<span class="diff diff-2">★★</span></div>
+    <div class="concept-item" data-id="dev-stack"><span>🛠️</span> Dev Stack<span class="diff diff-2">★★</span></div>
+    <h3>AI × Web3 Bridge</h3>
+    <div class="concept-item" data-id="bridge"><span>🔗</span> Bridge 总览</div>
+  </div>
+
+  <div class="main">
+    <div class="tabs">
+      <button class="tab active" data-view="map">概念地图</button>
+      <button class="tab" data-view="bridge">AI × Web3 Bridge</button>
+      <button class="tab" data-view="learning">学习路径</button>
+    </div>
+
+    <div class="map" id="mapView"></div>
+    <div class="detail" id="detail"></div>
+  </div>
+</div>
+
+<script>
+const concepts = {
+  network: {
+    title: "网络（Network）",
+    icon: "🌐",
+    diff: 2,
+    desc: "区块链网络的核心不是\"存数据\"，而是让互不信任的参与者对状态变化达成一致。理解网络，是为了知道一笔交易从钱包签名到最终被用户看到，中间经过了哪些层。",
+    sections: [
+      { title: "核心概念", items: [
+        "Block：交易批量提交和排序的单位，有 gas limit",
+        "Consensus：网络决定\"哪段历史有效\"的机制",
+        "PoS：用质押+惩罚机制维护网络安全",
+        "Testnet：测试合约和流程，不能替代主网安全审查",
+        "L2：降低费用和延迟，但多了桥和跨链复杂度",
+        "Rollup：Optimistic vs ZK，主流 L2 扩展路线"
+      ]},
+      { title: "关键原则", items: [
+        "交易有顺序，顺序影响结果",
+        "状态不是连续的，按区块批量推进",
+        "共识是信任来源，不是某家公司说了算",
+        "网络选择改变体验：主网/L2/测试网的费用和速度不同"
+      ]}
+    ],
+    bridge: "AI Agent 读链上状态时，必须知道自己在哪条网上操作——chain id、RPC、区块高度、确认数，不能靠模型\"猜\"。→ [[Chain-aware Context]]",
+    related: ["cryptography","wallet","smart-contract"]
+  },
+  cryptography: {
+    title: "密码学（Cryptography）",
+    icon: "🔐",
+    diff: 2,
+    desc: "密码学是 Web3 的数学地基。哈希、公私钥、签名——这些不是\"安全细节\"，而是去中心化系统中身份、授权和不可篡改性的来源。",
+    sections: [
+      { title: "核心概念", items: [
+        "哈希函数：任意输入 → 固定长度输出，单向不可逆，微小变化产生完全不同结果",
+        "公钥密码学：私钥签名、公钥验证，数学上无法从公钥反推私钥",
+        "数字签名：证明\"我授权了这笔交易\"，无法伪造",
+        "Merkle Tree：高效验证大量数据完整性，是区块结构的基础"
+      ]},
+      { title: "关键原则", items: [
+        "私钥 = 所有权，助记词 = 私钥的备份，绝不能公开",
+        "哈希 ≠ 加密，哈希是单向的，加密是可逆的",
+        "链上数据的不可篡改性来自哈希链 + 共识"
+      ]}
+    ],
+    bridge: "Agent 执行交易之前，签名是必经步骤。理解签名机制才能正确设计 Agent 的权限边界 → [[Agent Wallet]] [[AI Security]]",
+    related: ["wallet","smart-contract","security"]
+  },
+  wallet: {
+    title: "钱包（Wallet）",
+    icon: "👛",
+    diff: 2,
+    desc: "钱包不只是\"装币的\"，它是你在链上的身份入口和签名工具。钱包管理私钥 → 派生公钥 → 生成地址。",
+    sections: [
+      { title: "核心概念", items: [
+        "EOA（外部账户）：由私钥直接控制，用户持有",
+        "Smart Account（合约账户）：由代码控制，适合 Agent 权限管理",
+        "HD 钱包：从一个种子派生无限子密钥",
+        "多签钱包：需要多个签名才能执行交易"
+      ]},
+      { title: "关键原则", items: [
+        "钱包是\"签名器\"，不是\"余额显示器\"",
+        "私钥决定谁可以签名，地址决定谁可以接收",
+        "浏览器插件钱包（如 MetaMask）是开发者和用户的桥梁"
+      ]}
+    ],
+    bridge: "Agent 需要钱包来签名交易。Smart Account 比 EOA 更适合 Agent——可以设置权限、额度、时间限制 → [[Agent Wallet]] [[Account Abstraction]]",
+    related: ["cryptography","account-abstraction","smart-contract"]
+  },
+  "smart-contract": {
+    title: "智能合约（Smart Contract）",
+    icon: "📜",
+    diff: 2,
+    desc: "智能合约是部署在链上的代码，定义了不可篡改的规则。合约被调用时在 EVM 中执行，结果全网一致。",
+    sections: [
+      { title: "核心概念", items: [
+        "合约 = 链上代码 + 链上状态（storage）",
+        "EVM：栈式虚拟机，所有节点运行相同字节码",
+        "ABI：合约接口描述，告诉外部如何调用合约函数",
+        "Events：链上日志，便宜的存储方式",
+        "Gas：每次合约执行消耗的计算资源"
+      ]},
+      { title: "关键原则", items: [
+        "代码即法律——部署后不可修改（除非设计代理模式）",
+        "每次写操作消耗 gas，读操作免费（从本地节点）",
+        "revert 回滚状态变更，但仍消耗 gas"
+      ]}
+    ],
+    bridge: "Agent 调用合约 = 构造交易 data 字段（ABI 编码）→ 签名 → 发送。需要理解合约接口和 gas 估算 → [[Web3 Tool Use]]",
+    related: ["wallet","cryptography","security"]
+  },
+  "account-abstraction": {
+    title: "账户抽象（Account Abstraction）",
+    icon: "🏦",
+    diff: 3,
+    desc: "账户抽象打破了 EOA 的限制，让账户行为可以由智能合约逻辑定义。这是 Agent 钱包的基础设施。",
+    sections: [
+      { title: "核心概念", items: [
+        "ERC-4337：在不改变共识层的情况下实现账户抽象",
+        "UserOperation：替代传统交易的用户意图表达",
+        "Bundler：打包 UserOp 并提交上链",
+        "Paymaster：代付 gas，支持用任意 token 支付",
+        "Session Key：限时授权，Agent 的核心权限机制"
+      ]},
+      { title: "关键原则", items: [
+        "Smart Account 可以设置：日限额、白名单地址、时间窗口",
+        "Session Key = 给 Agent 一把\"有时限的钥匙\"",
+        "Account Abstraction 让钱包从\"私钥持有者\"变成\"权限管理器\""
+      ]}
+    ],
+    bridge: "这是 AI × Web3 最关键的基础设施之一。Agent 需要可编程的权限，而不是\"要么全能要么不能\"的 EOA → [[Agent Wallet]] [[Machine Payment]]",
+    related: ["wallet","smart-contract","defi"]
+  },
+  defi: {
+    title: "去中心化金融（DeFi）",
+    icon: "💰",
+    diff: 2,
+    desc: "DeFi 是用智能合约重建传统金融服务：借贷、交易、收益、保险，全部无需中介。",
+    sections: [
+      { title: "核心概念", items: [
+        "DEX（去中心化交易所）：AMM 做市，流动性池",
+        "借贷协议：超额抵押借贷，利率由算法决定",
+        "稳定币：锚定法币价值的链上资产",
+        "收益聚合：自动复投，优化收益策略",
+        "闪电贷：无需抵押的单区块借贷"
+      ]},
+      { title: "关键原则", items: [
+        "DeFi 的\"免信任\"是以代码透明为前提的——合约漏洞 = 资金风险",
+        "流动性是 DeFi 的血液，TVL 是核心指标",
+        "组合性（Composability）= 乐高积木，但也 = 风险级联"
+      ]}
+    ],
+    bridge: "Agent 可以自动执行 DeFi 策略：监测利率、再平衡、收益收割。但需要严格的权限限制 → [[Machine Payment]] [[Settlement & Escrow]]",
+    related: ["smart-contract","oracle","security"]
+  },
+  oracle: {
+    title: "预言机（Oracle）",
+    icon: "🔮",
+    diff: 3,
+    desc: "区块链是封闭系统，无法主动获取外部数据。Oracle 是链上世界与链下世界的桥梁。",
+    sections: [
+      { title: "核心概念", items: [
+        "Oracle 向链上提供外部数据：价格、天气、赛事结果……",
+        "Chainlink：去中心化 Oracle 网络，多数据源聚合",
+        "Push vs Pull：主动推送 vs 按需拉取",
+        "数据新鲜度：价格更新频率直接影响协议安全"
+      ]},
+      { title: "关键原则", items: [
+        "Oracle 问题是区块链的\"圣杯问题\"——信任最小化的外部数据极其困难",
+        "Oracle 操纵 = 协议被攻击的第一入口",
+        "不依赖单一 Oracle，价格来源要验证"
+      ]}
+    ],
+    bridge: "AI Agent 需要链下数据（如实时价格、新闻、分析结果）来做出决策，Oracle 是桥梁。Agent 自己也可以成为 Oracle → [[Verifiable AI]]",
+    related: ["defi","security","smart-contract"]
+  },
+  indexing: {
+    title: "索引（Indexing）",
+    icon: "📊",
+    diff: 2,
+    desc: "链上原始数据难以直接查询。索引层把交易、事件、状态整理成可搜索、可分析的结构化数据。",
+    sections: [
+      { title: "核心概念", items: [
+        "The Graph：去中心化索引协议，用 GraphQL 查询链上数据",
+        "事件驱动：合约 emit event → 索引器监听 → 存入数据库",
+        "RPC 原始查询 vs 索引查询：前者慢但全，后者快但可能有延迟",
+        "Dune Analytics：用 SQL 查询链上数据做看板"
+      ]},
+      { title: "关键原则", items: [
+        "好的索引设计 = 好的产品体验",
+        "不是所有数据都需要上链，Event 是便宜的存储方式",
+        "索引层延迟可能导致用户看到过期数据"
+      ]}
+    ],
+    bridge: "AI Agent 需要高效读取历史链上数据来做分析和决策。索引层让 Agent 不必逐块扫描 → [[Chain-aware Context]]",
+    related: ["smart-contract","dev-stack"]
+  },
+  security: {
+    title: "安全（Security）",
+    icon: "🛡️",
+    diff: 2,
+    desc: "Web3 安全不是事后补丁，而是系统设计的基线。合约漏洞、权限错误、Oracle 操纵——每层都有攻击面。",
+    sections: [
+      { title: "核心概念", items: [
+        "重入攻击：合约调用外部合约时状态未更新",
+        "权限控制：Ownable、AccessControl，谁可以调用什么",
+        "整数溢出：Solidity 0.8+ 已内置检查",
+        "闪电贷攻击：利用无抵押借贷操纵价格",
+        "前端攻击：用户签名的不是他们看到的"
+      ]},
+      { title: "关键原则", items: [
+        "审计不是\"安全检查\"，是最低要求",
+        "合约一旦部署无法修改 → 测试必须充分",
+        "用户看到的 ≠ 签名的内容（盲签风险）"
+      ]}
+    ],
+    bridge: "AI Agent 引入新的攻击面：Prompt Injection、工具滥用、权限泄露。Agent 安全需要专用框架 → [[AI Security]] [[Verifiable AI]]",
+    related: ["smart-contract","wallet","oracle"]
+  },
+  "dev-stack": {
+    title: "开发栈（Dev Stack）",
+    icon: "🛠️",
+    diff: 2,
+    desc: "Web3 开发栈是让你从\"写合约\"到\"用户能用\"的完整工具链。",
+    sections: [
+      { title: "核心概念", items: [
+        "语言：Solidity（主流）、Vyper、Rust（Solana）",
+        "框架：Hardhat、Foundry——编译、测试、部署",
+        "前端库：ethers.js、viem、wagmi——连接钱包和合约",
+        "测试：单元测试 + 集成测试 + 分叉主网测试",
+        "部署：脚本化部署 + 合约验证（区块浏览器）"
+      ]},
+      { title: "关键原则", items: [
+        "Hardhat/Foundry 不只是\"编译工具\"，是本地链模拟环境",
+        "ethers.js/viem 是前端和合约之间的翻译层",
+        "测试主网分叉可以模拟真实资产状态"
+      ]}
+    ],
+    bridge: "AI Agent 理解开发栈后可以辅助：写合约、生成测试、部署脚本、前端集成 → [[Web3 Tool Use]] [[Dev Tooling]]",
+    related: ["smart-contract","network","indexing"]
+  },
+  bridge: {
+    title: "AI × Web3 Bridge 总览",
+    icon: "🔗",
+    diff: 2,
+    desc: "这 10 个 Web3 基础概念构成了链上世界的底层语言。AI × Web3 Bridge 是把这些概念和 AI Agent 能力连接起来的交叉层。",
+    sections: [
+      { title: "Bridge 核心领域", items: [
+        "Chain-aware Context → 链上状态进入 Agent 上下文（依赖 Network + Indexing）",
+        "Web3 Tool Use → Agent 调用 RPC/钱包/合约（依赖 Wallet + Smart Contract + Dev Stack）",
+        "Agent Wallet → Agent 权限管理（依赖 Account Abstraction + Wallet）",
+        "Machine Payment → 机器间支付结算（依赖 DeFi + Account Abstraction）",
+        "Verifiable AI → 模型输出可验证（依赖 Cryptography + Security）",
+        "AI Security → Prompt Injection、工具滥用防护（依赖 Security + Oracle）"
+      ]}
+    ],
+    bridge: "Web3 基础 → AI × Web3 Bridge → 前沿探索（Agentic Commerce、Wallet/Permission、Dev Tooling、AI Security、Governance）",
+    related: ["network","wallet","account-abstraction","security"]
+  }
+};
+
+let current = 'network';
+
+function selectConcept(id) {
+  current = id;
+  document.querySelectorAll('.concept-item,.map-node').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll(`[data-id="${id}"]`).forEach(el => el.classList.add('active'));
+  renderDetail(id);
+  if (document.querySelector('.tab.active').dataset.view === 'bridge') renderBridge();
+  else if (document.querySelector('.tab.active').dataset.view === 'learning') renderLearning();
+}
+
+function renderDetail(id) {
+  const c = concepts[id];
+  if (!c) return;
+  let html = `<h2>${c.icon} ${c.title}</h2>`;
+  html += `<div class="meta">难度: ${'⭐'.repeat(c.diff)} · <a href="https://aiweb3.school/zh/handbook/web3/${id}/" target="_blank">Handbook →</a></div>`;
+  html += `<p class="desc">${c.desc}</p>`;
+  c.sections.forEach(s => {
+    html += `<h3>${s.title}</h3><ul>${s.items.map(i => `<li>${i}</li>`).join('')}</ul>`;
+  });
+  if (c.bridge) {
+    html += `<div class="bridge"><strong>🤖 AI × Web3 视角：</strong>${c.bridge}</div>`;
+  }
+  if (c.related) {
+    html += `<div class="links">${c.related.map(r => {
+      const rc = concepts[r];
+      return rc ? `<a href="#" onclick="selectConcept('${r}');return false">${rc.icon} ${rc.title}</a>` : '';
+    }).join('')}</div>`;
+  }
+  document.getElementById('detail').innerHTML = html;
+}
+
+function renderMap() {
+  const entries = Object.entries(concepts).filter(([k]) => k !== 'bridge');
+  let html = '';
+  entries.forEach(([id, c]) => {
+    html += `<div class="map-node${id===current?' active':''}" data-id="${id}" onclick="selectConcept('${id}')">
+      <span class="icon">${c.icon}</span>
+      <div class="title">${c.title}</div>
+      <div class="brief">${'⭐'.repeat(c.diff)}</div>
+    </div>`;
+  });
+  document.getElementById('mapView').innerHTML = html;
+  document.getElementById('mapView').style.display = 'grid';
+  document.getElementById('detail').style.display = 'block';
+}
+
+function renderBridge() {
+  document.getElementById('mapView').style.display = 'none';
+  document.getElementById('detail').style.display = 'block';
+  const connections = [
+    { from:'network', to:'chain-aware', label:'链上状态→Agent上下文' },
+    { from:'wallet', to:'agent-wallet', label:'Agent权限管理' },
+    { from:'account-abstraction', to:'agent-wallet', label:'Smart Account+Session Key' },
+    { from:'smart-contract', to:'web3-tool-use', label:'Agent调用合约' },
+    { from:'dev-stack', to:'web3-tool-use', label:'工具链调用' },
+    { from:'defi', to:'machine-payment', label:'Agent自动支付' },
+    { from:'oracle', to:'verifiable-ai', label:'Agent成为Oracle' },
+    { from:'indexing', to:'chain-aware', label:'高效数据查询' },
+    { from:'security', to:'ai-security', label:'AI特有攻击面' },
+    { from:'cryptography', to:'verifiable-ai', label:'签名验证' },
+  ];
+  let html = '<h2>🔗 AI × Web3 Bridge 连接图</h2>';
+  html += '<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center;margin-top:1rem">';
+  html += '<div style="text-align:right"><h3 style="color:#58a6ff;margin-bottom:.5rem">Web3 基础</h3>';
+  const seen = new Set();
+  connections.forEach(c => {
+    if (seen.has(c.from)) return; seen.add(c.from);
+    const co = concepts[c.from];
+    if (co) html += `<div style="padding:.3rem 0;font-size:.85rem">${co.icon} ${co.title}</div>`;
+  });
+  html += '</div><div style="text-align:center;color:#8b949e;font-size:2rem">→</div>';
+  html += '<div><h3 style="color:#3fb950;margin-bottom:.5rem">Bridge 层</h3>';
+  connections.forEach(c => {
+    html += `<div style="padding:.3rem 0;font-size:.85rem">🔗 ${c.label}</div>`;
+  });
+  html += '</div></div>';
+  document.getElementById('detail').innerHTML = html;
+}
+
+function renderLearning() {
+  document.getElementById('mapView').style.display = 'none';
+  document.getElementById('detail').style.display = 'block';
+  let html = '<h2>📖 推荐学习路径</h2>';
+  const paths = [
+    { phase:'Phase 1: 地基', items:['network → 理解链上环境的运作方式','cryptography + wallet → 掌握身份和签名的底层逻辑','smart-contract → 学会读和写链上规则'], color:'#3fb950' },
+    { phase:'Phase 2: 进阶', items:['account-abstraction → Agent 钱包的基石','defi → 理解开放金融的乐高积木','dev-stack → 能把合约变成产品'], color:'#d29922' },
+    { phase:'Phase 3: 纵深', items:['oracle → 链上链下数据的桥梁','indexing → 让链上数据可查询可分析','security → 守住每一层的攻击面'], color:'#f0883e' },
+  ];
+  paths.forEach(p => {
+    html += `<h3 style="color:${p.color};margin-top:1rem">${p.phase}</h3><ul>`;
+    p.items.forEach(i => html += `<li>${i}</li>`);
+    html += '</ul>';
+  });
+  html += '<p style="margin-top:1.5rem;color:#8b949e">💡 学完 Web3 基础后，进入 <a href="#" style="color:#58a6ff" onclick="selectConcept(\'bridge\');return false">AI × Web3 Bridge</a> 把知识和 Agent 能力连接起来。</p>';
+  document.getElementById('detail').innerHTML = html;
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const view = tab.dataset.view;
+    if (view === 'map') renderMap();
+    else if (view === 'bridge') { selectConcept('bridge'); renderBridge(); }
+    else if (view === 'learning') renderLearning();
+  });
+});
+
+document.querySelectorAll('.concept-item').forEach(item => {
+  item.addEventListener('click', () => selectConcept(item.dataset.id));
+});
+
+renderMap();
+renderDetail('network');
+</script>
+</body>
+</html>
